@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Search Results</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+</head>
+<body>
+  <nav class="nav">
+    <div class="logo">
+      <span class="icon" aria-hidden="true">⚖</span>
+      <span>SCC</span>
+    </div>
+    <div class="menu-icon" aria-label="Menu" tabindex="0">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </nav>
+  <main>
+    <section class="hero">
+      <div class="hero-overlay">
+        <% if (error) { %>
+          <div class="alert"><%= error %></div>
+        <% } else if (results.length === 0) { %>
+          <div class="alert">No cases found.</div>
+        <% } else { %>
+          <ul class="results-list">
+            <% results.forEach(function(caseItem) { %>
+              <li class="box">
+                <h3><%= caseItem.title %></h3>
+                <p><strong>Date:</strong> <%= caseItem.date %></p>
+                <p><strong>Citation:</strong> <%= caseItem.citation %></p>
+                <p><strong>Court:</strong> <%= caseItem.court %></p>
+                <p><strong>Judges:</strong> <%= caseItem.judges %></p>
+                <p><strong>Majority Opinion:</strong> <%= caseItem.majorityOpinion %></p>
+                <p><strong>Source:</strong> <%= caseItem.sourceLabel %></p>
+                <p><%= caseItem.description %></p>
+              </li>
+            <% }); %>
+          </ul>
+        <% } %>
+        <a href="/" class="btn">Back to Search</a>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div>A PROJECT BY</div>
+    <div class="logo-footer">
+      <img src="/GOiF_Logo.png" alt="Global Open Initiative Foundation Logo" />
+      <br />
+      <small>GLOBAL OPEN INITIATIVE FOUNDATION</small>
+    </div>
+  </footer>
+</body>
+</html>
+
+<!--DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Search Results</title>
+  <link rel="stylesheet" href="/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+</head>
+<body>
+
+  <--nav class="nav">
+    <div class="logo">
+      <span class="icon">⚖</span>
+      <span>SCC</span>
+    </div>
+    <div class="menu-icon" aria-label="Menu">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </nav>
+  <section class="hero">
+    <div class="hero-overlay">
+      <h1>Results for "<%= query %>"</h1>
+      <% if (error) { %>
+        <p><%= error %></p>
+      <% } else if (results.length === 0) { %>
+        <p>No cases found.</p>
+      <% } else { %>
+        <ul>
+          <% results.forEach(function(caseItem) { %>
+            <li class="box">
+              <h3><%= caseItem.title %></h3>
+              <p><strong>Date:</strong> <%= caseItem.date %></p>
+              <p><strong>Citation:</strong> <%= caseItem.citation %></p>
+              <p><strong>Court:</strong> <%= caseItem.court %></p>
+              <p><strong>Judges:</strong> <%= caseItem.judges %></p>
+              <p><strong>Majority Opinion:</strong> <%= caseItem.majorityOpinion %></p>
+              <p><strong>Source:</strong> <%= caseItem.sourceLabel %></p>
+              <p><%= caseItem.description %></p>
+            </li>
+          <% }); %>
+        </ul>
+      <% } %>
+      <a href="/" class="btn">Back to Search</a>
+    </div>
+  </section>
+  <footer>
+    <div>A PROJECT BY</div>
+    <div class="logo-footer">
+      <img src="/GOiF_Logo.png" alt="Global Open Initiative Foundation Logo" />
+      <br />
+      <small>GLOBAL OPEN INITIATIVE FOUNDATION</small>
+    </div>
+  </footer>
+</body>
+</html-->
