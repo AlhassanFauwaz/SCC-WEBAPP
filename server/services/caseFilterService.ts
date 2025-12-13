@@ -46,9 +46,9 @@ export class CaseFilterService {
         const searchTerm = keyword.toLowerCase();
         return (
             caseData.title.toLowerCase().includes(searchTerm) ||
-            (caseData.description && caseData.description.toLowerCase().includes(searchTerm)) ||
-            (caseData.citation && caseData.citation.toLowerCase().includes(searchTerm)) ||
-            (caseData.court && caseData.court.toLowerCase().includes(searchTerm))
+            (!!caseData.description && caseData.description.toLowerCase().includes(searchTerm)) ||
+            (!!caseData.citation && caseData.citation.toLowerCase().includes(searchTerm)) ||
+            (!!caseData.court && caseData.court.toLowerCase().includes(searchTerm))
         );
     }
 
@@ -98,8 +98,8 @@ export class CaseFilterService {
         const searchType = caseType.toLowerCase();
         return (
             caseData.title.toLowerCase().includes(searchType) ||
-            (caseData.description && caseData.description.toLowerCase().includes(searchType)) ||
-            (caseData.citation && caseData.citation.toLowerCase().includes(searchType))
+            (!!caseData.description && caseData.description.toLowerCase().includes(searchType)) ||
+            (!!caseData.citation && caseData.citation.toLowerCase().includes(searchType))
         );
     }
 
