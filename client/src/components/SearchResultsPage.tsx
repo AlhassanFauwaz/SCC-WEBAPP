@@ -3,17 +3,22 @@ import Header from './Header';
 import Footer from './Footer';
 import CaseCard from './CaseCard';
 import LoadingSpinner from './LoadingSpinner';
+import FilterPanel, { FilterValues } from './FilterPanel';
 import { SearchState } from '../../App';
 import '../styles/SearchResultsPage.css';
 
 interface SearchResultsPageProps {
   searchState: SearchState;
   onBackToSearch: () => void;
+  onApplyFilters?: (filters: FilterValues) => void;
+  onResetFilters?: () => void;
 }
 
 const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
   searchState,
-  onBackToSearch
+  onBackToSearch,
+  onApplyFilters,
+  onResetFilters
 }) => {
   const { query, results, loading, error } = searchState;
 
@@ -23,6 +28,15 @@ const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
 
       <main className="main-content">
         <section className="results-section">
+          {/* Filter Panel */}
+          {onApplyFilters && onResetFilters && (
+            <FilterPanel
+              onApplyFilters={onApplyFilters}
+              onResetFilters={onResetFilters}
+              isLoading={loading}
+            />
+          )}
+
           {loading ? (
             <LoadingSpinner />
           ) : error ? (
@@ -41,7 +55,8 @@ const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
               <div className="results-header">
                 <h2>Search Results</h2>
                 <p className="results-count">
-                  Found {results.length} case{results.length !== 1 ? 's' : ''} for "{query}"
+                  Found {results.length} case{results.length !== 1 ? 's' : ''}
+                  {query && ` for "${query}"`}
                 </p>
               </div>
               <div className="results-grid">

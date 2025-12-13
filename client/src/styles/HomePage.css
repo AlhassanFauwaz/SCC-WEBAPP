@@ -14,7 +14,8 @@
   background-size: 400% 400%;
   animation: gradientShift 8s ease-in-out infinite;
   padding: var(--space-8) var(--space-4);
-  min-height: calc(100vh - 140px);
+  padding-top: calc(70px + var(--space-8)); /* Header height + spacing */
+  min-height: calc(100vh - 70px); /* Full viewport minus header */
 }
 
 @keyframes gradientShift {
@@ -159,7 +160,8 @@
 @media (max-width: 768px) {
   .hero-section {
     padding: var(--space-6) var(--space-3);
-    min-height: calc(100vh - 120px);
+    padding-top: calc(60px + var(--space-6)); /* Mobile header height + spacing */
+    min-height: calc(100vh - 60px); /* Full viewport minus mobile header */
   }
   
   .hero-title {

@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
-import axios from "axios";
 import cors from "cors";
 import dotenv from "dotenv";
+import { CaseController } from "./controllers/caseController";
 
 // Load environment variables
 dotenv.config();
@@ -37,80 +37,26 @@ app.get("/", (req: Request, res: Response) => {
             health: "GET /api/health",
             search_all_cases: "GET /search",
             search_with_query: "GET /search?q={query}",
+            filter_cases: "GET /filter?keyword={keyword}&year={year}&judge={judge}&type={type}",
             examples: [
                 "http://localhost:9090/api/health",
                 "http://localhost:9090/search",
                 "http://localhost:9090/search?q=human+rights",
-                "http://localhost:9090/search?q=constitution"
+                "http://localhost:9090/search?q=constitution",
+                "http://localhost:9090/filter?keyword=rights&year=2020",
+                "http://localhost:9090/filter?judge=Smith&year=2019",
+                "http://localhost:9090/filter?type=criminal&year=2021"
             ]
         },
-        documentation: "Use /search endpoint to get case data"
+        documentation: "Use /search or /filter endpoints to get case data"
     });
 });
 
-// ✅ Search endpoint returning JSON
-app.get("/search", async (req: Request, res: Response) => {
-    const userQuery = (req.query.q as string)?.trim().toLowerCase() || "";
+// ✅ Search endpoint
+app.get("/search", CaseController.search);
 
-    const sparqlQuery = `
-    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?date ?legal_citation ?courtLabel ?majority_opinionLabel ?sourceLabel (GROUP_CONCAT(DISTINCT ?judge; SEPARATOR = ", ") AS ?judges) WHERE {
-      {
-        SELECT DISTINCT * WHERE {
-          ?item (wdt:P31/(wdt:P279*)) wd:Q114079647;
-            (wdt:P17/(wdt:P279*)) wd:Q117;
-            (wdt:P1001/(wdt:P279*)) wd:Q117;
-            (wdt:P793/(wdt:P279*)) wd:Q7099379;
-            wdt:P4884 ?court.
-          ?court (wdt:P279*) wd:Q1513611.
-        }
-        LIMIT 5000
-      }
-      ?item wdt:P577 ?date;
-        wdt:P1031 ?legal_citation;
-        wdt:P1433 ?source;
-        wdt:P1594 _:b3.
-      _:b3 rdfs:label ?judge.
-      FILTER((LANG(?judge)) = "en")
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en". }
-    }
-    GROUP BY ?item ?itemLabel ?itemDescription ?date ?legal_citation ?courtLabel ?majority_opinionLabel ?sourceLabel
-    ORDER BY (?date)`;
-
-    try {
-        const url = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
-        const { data } = await axios.get(url, { timeout: 10000 });
-
-        const cases = (data as any).results.bindings
-            .map((item: any) => ({
-                caseId: item.item?.value.split("/").pop() || "Not Available",
-                title: item.itemLabel?.value || "Not Available",
-                description: item.itemDescription?.value || "No description available",
-                date: item.date?.value?.split("T")[0] || "Date not recorded",
-                citation: item.legal_citation?.value || "Citation unavailable",
-                court: item.courtLabel?.value || "Court not specified",
-                majorityOpinion: item.majority_opinionLabel?.value || "Majority opinion unavailable",
-                sourceLabel: item.sourceLabel?.value || "Source unavailable",
-                judges: item.judges?.value || "Judges unavailable",
-                articleUrl: item.item?.value || ""
-            }))
-            .filter((caseData: any) => {
-                if (!userQuery) return true; // Return all if no query
-                
-                return (
-                    caseData.title.toLowerCase().includes(userQuery) ||
-                    (caseData.description && caseData.description.toLowerCase().includes(userQuery)) ||
-                    (caseData.judges && caseData.judges.toLowerCase().includes(userQuery)) ||
-                    (caseData.citation && caseData.citation.toLowerCase().includes(userQuery)) ||
-                    (caseData.court && caseData.court.toLowerCase().includes(userQuery))
-                );
-            });
-
-        res.json({ success: true, results: cases });
-    } catch (error) {
-        console.error("❌ API Error:", error);
-        res.status(500).json({ success: false, error: "Please check your internet connection!" });
-    }
-});
+// ✅ Filter endpoint with advanced filtering
+app.get("/filter", CaseController.filter);
 
 // Start server
 app.listen(PORT, () => {
