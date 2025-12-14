@@ -27,12 +27,8 @@ const HomePage: React.FC<HomePageProps> = ({
     }
   };
 
-  const handleSearchInputClick = () => {
-    setShowFilters(true);
-  };
-
-  const handleSearchButtonClick = () => {
-    setShowFilters(true);
+  const handleFilterToggle = () => {
+    setShowFilters(!showFilters);
   };
 
   const handleApplyFilters = (filters: FilterValues) => {
@@ -56,29 +52,41 @@ const HomePage: React.FC<HomePageProps> = ({
         <div className="hero-overlay">
           <h1 className="hero-title">SUPREME COURT CASES</h1>
           
-          <form className="search-container" onSubmit={handleSubmit}>
-            <div className="search-box">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onClick={handleSearchInputClick}
-                placeholder="Search for a case by name, number, or keyword"
-                className="search-input"
-                autoComplete="off"
-                required
-              />
-              <button 
-                type="submit" 
-                className="search-button"
-                onClick={handleSearchButtonClick}
-              >
-                <i className="fas fa-search"></i>
-              </button>
-            </div>
-          </form>
+          <div className="search-container">
+            <form className="search-form" onSubmit={handleSubmit}>
+              <div className="search-box">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search for a case by name, number, or keyword"
+                  className="search-input"
+                  autoComplete="off"
+                  required
+                />
+                <button 
+                  type="submit" 
+                  className="search-button"
+                >
+                  <i className="fas fa-search"></i>
+                </button>
+              </div>
+            </form>
+            <button 
+              type="button"
+              className="filter-toggle-button"
+              onClick={handleFilterToggle}
+              aria-label="Toggle filters"
+              aria-expanded={showFilters}
+            >
+              <i className="fas fa-filter"></i>
+              <span>Filters</span>
+              {showFilters && <i className="fas fa-chevron-up"></i>}
+              {!showFilters && <i className="fas fa-chevron-down"></i>}
+            </button>
+          </div>
 
-          {/* Filter Panel - appears below search bar when clicked */}
+          {/* Filter Panel - appears below search bar when filter button is clicked */}
           {showFilters && onApplyFilters && onResetFilters && (
             <div className="homepage-filters-container">
               <FilterPanel

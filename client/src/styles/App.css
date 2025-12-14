@@ -145,6 +145,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: var(--space-4);
+  color: var(--secondary-green); /* Ghana Flag Green */
 }
 
 h1 { font-size: var(--font-size-4xl); }

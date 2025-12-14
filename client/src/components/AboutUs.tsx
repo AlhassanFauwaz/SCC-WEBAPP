@@ -162,7 +162,7 @@ const AboutUs: React.FC<AboutUsProps> = ({ onNavigateToHome }) => {
         </div>
       </main>
 
-      <Footer />
+      <Footer onNavigateToHome={onNavigateToHome} />
     </div>
   );
 };

@@ -157,7 +157,7 @@
 .section-title {
   font-size: var(--font-size-3xl);
   font-weight: 700;
-  color: var(--primary-red);
+  color: var(--secondary-green); /* Ghana Flag Green */
   margin-bottom: var(--space-6);
   text-align: center;
 }
@@ -207,7 +207,7 @@
 .feature-title {
   font-size: var(--font-size-xl);
   font-weight: 700;
-  color: var(--primary-red);
+  color: var(--secondary-green); /* Ghana Flag Green */
   margin-bottom: var(--space-3);
 }
 
@@ -242,7 +242,7 @@
 .audience-title {
   font-size: var(--font-size-xl);
   font-weight: 700;
-  color: var(--primary-red);
+  color: var(--secondary-green); /* Ghana Flag Green */
   margin-bottom: var(--space-3);
 }
 

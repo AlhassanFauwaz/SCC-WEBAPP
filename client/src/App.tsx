@@ -146,57 +146,6 @@ function App() {
       if (filters.judge) params.append('judge', filters.judge);
       if (filters.caseType) params.append('type', filters.caseType);
 
-      const response = await fetch(`${apiBaseUrl}/filter?${params.toString()}`);
-
-      if (!response.ok) {
-        throw new Error('Filter request failed');
-      }
-
-      const data = await response.json();
-      setSearchState(prev => ({
-        ...prev,
-        loading: false,
-        results: data.results || [],
-        error: data.results && data.results.length === 0 ? 'No cases found matching the filters.' : null,
-        isFiltered: true,
-        query: '' // Clear query when using filters
-      }));
-
-    } catch (error) {
-      setSearchState(prev => ({
-        ...prev,
-        loading: false,
-        error: 'Please check your internet connection!'
-      }));
-    }
-  };
-
-  const handleResetFilters = async () => {
-    // Reset to show all cases or go back to home
-    setSearchState(prev => ({ 
-      ...prev, 
-      query: '', 
-      results: [], 
-      error: null, 
-      isFiltered: false 
-    }));
-    setCurrentView('home');
-  };
-
-  const handleApplyFilters = async (filters: FilterValues) => {
-    setSearchState(prev => ({ ...prev, loading: true, error: null }));
-    setCurrentView('results');
-
-    try {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9090';
-      
-      // Build query parameters
-      const params = new URLSearchParams();
-      if (filters.keyword) params.append('keyword', filters.keyword);
-      if (filters.year) params.append('year', filters.year);
-      if (filters.judge) params.append('judge', filters.judge);
-      if (filters.caseType) params.append('type', filters.caseType);
-
       const response = await fetch(`${apiBaseUrl}/filter?${params.toString()}`, {
         signal: AbortSignal.timeout(30000) // 30 second timeout
       });
@@ -236,6 +185,7 @@ function App() {
         loading: false,
         results: data.results || [],
         error: data.results && data.results.length === 0 ? 'No cases found matching the filters.' : null,
+        isFiltered: true,
         query: '' // Clear query when using filters
       }));
 
@@ -267,7 +217,8 @@ function App() {
       ...prev, 
       query: '', 
       results: [], 
-      error: null 
+      error: null,
+      isFiltered: false
     }));
     setCurrentView('home');
   };
@@ -289,6 +240,8 @@ function App() {
           onBackToSearch={handleBackToSearch}
           onApplyFilters={handleApplyFilters}
           onResetFilters={handleResetFilters}
+          onNavigateToHome={handleNavigateToHome}
+          onNavigateToAbout={handleNavigateToAbout}
         />
       )}
     </div>

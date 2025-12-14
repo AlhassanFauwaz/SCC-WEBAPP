@@ -133,8 +133,16 @@
 
 .search-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
   animation: slideInUp 1s ease-out 0.3s both;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-form {
+  width: 100%;
 }
 
 @keyframes slideInUp {
@@ -225,6 +233,52 @@
   font-size: var(--font-size-xl);
 }
 
+.filter-toggle-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  color: var(--primary-red);
+  border: 2px solid var(--primary-red);
+  border-radius: var(--border-radius-xl);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+  min-width: 140px;
+}
+
+.filter-toggle-button:hover {
+  background: var(--primary-red);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.filter-toggle-button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-md);
+}
+
+.filter-toggle-button:focus {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+.filter-toggle-button i {
+  font-size: var(--font-size-base);
+}
+
+.filter-toggle-button[aria-expanded="true"] {
+  background: var(--primary-red);
+  color: var(--white);
+  border-color: var(--primary-red-dark);
+}
+
 /* Homepage Filters Container */
 .homepage-filters-container {
   width: 100%;
@@ -278,6 +332,12 @@
     font-size: var(--font-size-lg);
   }
 
+  .filter-toggle-button {
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--font-size-sm);
+    min-width: 120px;
+  }
+
   .homepage-filters-container {
     margin-top: var(--space-6);
     max-width: 100%;
@@ -298,6 +358,16 @@
   .search-button {
     padding: var(--space-3) var(--space-4);
     min-width: 50px;
+  }
+
+  .filter-toggle-button {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-xs);
+    min-width: 100px;
+  }
+
+  .filter-toggle-button span {
+    display: none;
   }
 
   .homepage-filters-container {

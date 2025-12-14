@@ -12,13 +12,17 @@ interface SearchResultsPageProps {
   onBackToSearch: () => void;
   onApplyFilters?: (filters: FilterValues) => void;
   onResetFilters?: () => void;
+  onNavigateToHome?: () => void;
+  onNavigateToAbout?: () => void;
 }
 
 const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
   searchState,
   onBackToSearch,
   onApplyFilters,
-  onResetFilters
+  onResetFilters,
+  onNavigateToHome,
+  onNavigateToAbout
 }) => {
   const { query, results, loading, error } = searchState;
 
@@ -72,7 +76,10 @@ const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
         </section>
       </main>
 
-      <Footer />
+      <Footer 
+        onNavigateToHome={onNavigateToHome}
+        onNavigateToAbout={onNavigateToAbout}
+      />
     </div>
   );
 };
