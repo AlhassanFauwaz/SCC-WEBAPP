@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import HomePage from './components/HomePage';
 import SearchResultsPage from './components/SearchResultsPage';
 import AboutUs from './components/AboutUs';
+import { FilterValues } from './components/FilterPanel';
 import './styles/App.css';
 
 export interface Case {
@@ -92,10 +93,64 @@ function App() {
     setSearchState(prev => ({ ...prev, query: '', results: [], error: null }));
   };
 
+  const handleApplyFilters = async (filters: FilterValues) => {
+    setSearchState(prev => ({ ...prev, loading: true, error: null }));
+    setCurrentView('results');
+
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9090';
+      
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (filters.keyword) params.append('keyword', filters.keyword);
+      if (filters.year) params.append('year', filters.year);
+      if (filters.judge) params.append('judge', filters.judge);
+      if (filters.caseType) params.append('type', filters.caseType);
+
+      const response = await fetch(`${apiBaseUrl}/filter?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error('Filter request failed');
+      }
+
+      const data = await response.json();
+      setSearchState(prev => ({
+        ...prev,
+        loading: false,
+        results: data.results || [],
+        error: data.results && data.results.length === 0 ? 'No cases found matching the filters.' : null,
+        query: '' // Clear query when using filters
+      }));
+
+    } catch (error) {
+      setSearchState(prev => ({
+        ...prev,
+        loading: false,
+        error: 'Please check your internet connection!'
+      }));
+    }
+  };
+
+  const handleResetFilters = async () => {
+    // Reset to show all cases or go back to home
+    setSearchState(prev => ({ 
+      ...prev, 
+      query: '', 
+      results: [], 
+      error: null 
+    }));
+    setCurrentView('home');
+  };
+
   return (
     <div className="app">
       {currentView === 'home' ? (
-        <HomePage onSearch={handleSearch} onNavigateToAbout={handleNavigateToAbout} />
+        <HomePage 
+          onSearch={handleSearch} 
+          onNavigateToAbout={handleNavigateToAbout}
+          onApplyFilters={handleApplyFilters}
+          onResetFilters={handleResetFilters}
+        />
       ) : currentView === 'about' ? (
         <AboutUs onNavigateToHome={handleNavigateToHome} />
       ) : (
