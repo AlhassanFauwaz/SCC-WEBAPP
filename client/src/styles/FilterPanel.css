@@ -16,7 +16,7 @@
 .filter-title {
   font-size: var(--font-size-xl);
   font-weight: 700;
-  color: var(--primary-blue);
+  color: var(--primary-red);
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -55,7 +55,7 @@
 }
 
 .filter-label i {
-  color: var(--primary-blue);
+  color: var(--primary-red);
   font-size: var(--font-size-base);
 }
 
@@ -74,8 +74,8 @@
 .filter-input:focus,
 .filter-select:focus {
   outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-red);
+  box-shadow: 0 0 0 3px rgba(206, 17, 38, 0.1);
 }
 
 .filter-input::placeholder {
@@ -115,19 +115,27 @@
 }
 
 .filter-button-apply {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+  background: linear-gradient(135deg, var(--primary-red), var(--primary-red-light));
   color: var(--white);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 12px rgba(206, 17, 38, 0.3);
+  font-weight: 600;
 }
 
 .filter-button-apply:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--primary-blue-dark), var(--primary-blue));
+  background: linear-gradient(135deg, var(--primary-red-dark), var(--primary-red));
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 6px 16px rgba(206, 17, 38, 0.4);
 }
 
 .filter-button-apply:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(206, 17, 38, 0.3);
+  background: var(--primary-red-dark);
+}
+
+.filter-button-apply:focus {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
 }
 
 .filter-button-reset {
@@ -166,18 +174,18 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  background: var(--secondary-blue);
-  color: var(--primary-blue);
+  background: var(--primary-red-subtle);
+  color: var(--primary-red);
   border-radius: var(--border-radius-full);
   font-size: var(--font-size-sm);
   font-weight: 500;
-  border: 1px solid var(--primary-blue-light);
+  border: 1px solid var(--primary-red-light);
 }
 
 .filter-tag-remove {
   background: transparent;
   border: none;
-  color: var(--primary-blue);
+  color: var(--primary-red);
   cursor: pointer;
   font-size: var(--font-size-lg);
   line-height: 1;
@@ -192,8 +200,13 @@
 }
 
 .filter-tag-remove:hover {
-  background: var(--primary-blue);
+  background: var(--primary-red);
   color: var(--white);
+}
+
+.filter-tag-remove:focus {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 1px;
 }
 
 /* Responsive Design */

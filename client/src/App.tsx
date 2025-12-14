@@ -55,15 +55,40 @@ function App() {
 
     try {
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9090';
-      const response = await fetch(`${apiBaseUrl}/search?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`${apiBaseUrl}/search?q=${encodeURIComponent(query)}`, {
+        signal: AbortSignal.timeout(30000) // 30 second timeout
+      });
 
       if (!response.ok) {
-        throw new Error('Search request failed');
+        // Try to get error message from response
+        let errorMessage = 'Unable to fetch cases.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If response is not JSON, use status-based message
+          if (response.status === 500) {
+            errorMessage = 'Server error. The backend may be experiencing issues.';
+          } else if (response.status === 404) {
+            errorMessage = 'API endpoint not found. Please check if the backend server is running.';
+          } else if (response.status === 503) {
+            errorMessage = 'Service temporarily unavailable. Wikidata may be slow to respond.';
+          }
+        }
+        throw new Error(errorMessage);
       }
 
-      // Since the backend returns HTML, we'll need to parse it or modify the backend
-      // For now, let's simulate the expected response structure
       const data = await response.json();
+      
+      // Validate response structure
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid response format from server.');
+      }
+
+      if (!Array.isArray(data.results)) {
+        throw new Error('Unexpected response format. Results should be an array.');
+      }
+
       setSearchState(prev => ({
         ...prev,
         loading: false,
@@ -71,11 +96,24 @@ function App() {
         error: data.results.length === 0 ? `No matches found for "${query}".` : null
       }));
 
-    } catch (error) {
+    } catch (error: any) {
+      let errorMessage = 'Unable to fetch cases.';
+      
+      if (error.name === 'AbortError' || error.name === 'TimeoutError') {
+        errorMessage = 'Request timed out. Wikidata may be slow. Please try again.';
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage = 'Cannot connect to backend server. Please ensure the server is running on port 9090.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = 'An unexpected error occurred. Please try again.';
+      }
+
+      console.error('Search error:', error);
       setSearchState(prev => ({
         ...prev,
         loading: false,
-        error: 'Please check your internet connection!'
+        error: errorMessage
       }));
     }
   };
@@ -145,10 +183,104 @@ function App() {
     setCurrentView('home');
   };
 
+  const handleApplyFilters = async (filters: FilterValues) => {
+    setSearchState(prev => ({ ...prev, loading: true, error: null }));
+    setCurrentView('results');
+
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9090';
+      
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (filters.keyword) params.append('keyword', filters.keyword);
+      if (filters.year) params.append('year', filters.year);
+      if (filters.judge) params.append('judge', filters.judge);
+      if (filters.caseType) params.append('type', filters.caseType);
+
+      const response = await fetch(`${apiBaseUrl}/filter?${params.toString()}`, {
+        signal: AbortSignal.timeout(30000) // 30 second timeout
+      });
+
+      if (!response.ok) {
+        // Try to get error message from response
+        let errorMessage = 'Unable to filter cases.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If response is not JSON, use status-based message
+          if (response.status === 500) {
+            errorMessage = 'Server error. The backend may be experiencing issues.';
+          } else if (response.status === 404) {
+            errorMessage = 'Filter endpoint not found. Please check if the backend server is running.';
+          } else if (response.status === 503) {
+            errorMessage = 'Service temporarily unavailable. Wikidata may be slow to respond.';
+          }
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      
+      // Validate response structure
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid response format from server.');
+      }
+
+      if (!Array.isArray(data.results)) {
+        throw new Error('Unexpected response format. Results should be an array.');
+      }
+
+      setSearchState(prev => ({
+        ...prev,
+        loading: false,
+        results: data.results || [],
+        error: data.results && data.results.length === 0 ? 'No cases found matching the filters.' : null,
+        query: '' // Clear query when using filters
+      }));
+
+    } catch (error: any) {
+      let errorMessage = 'Unable to filter cases.';
+      
+      if (error.name === 'AbortError' || error.name === 'TimeoutError') {
+        errorMessage = 'Request timed out. Wikidata may be slow. Please try again.';
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage = 'Cannot connect to backend server. Please ensure the server is running on port 9090.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = 'An unexpected error occurred. Please try again.';
+      }
+
+      console.error('Filter error:', error);
+      setSearchState(prev => ({
+        ...prev,
+        loading: false,
+        error: errorMessage
+      }));
+    }
+  };
+
+  const handleResetFilters = async () => {
+    // Reset to show all cases or go back to home
+    setSearchState(prev => ({ 
+      ...prev, 
+      query: '', 
+      results: [], 
+      error: null 
+    }));
+    setCurrentView('home');
+  };
+
   return (
     <div className="app">
       {currentView === 'home' ? (
-        <HomePage onSearch={handleSearch} onNavigateToAbout={handleNavigateToAbout} />
+        <HomePage 
+          onSearch={handleSearch} 
+          onNavigateToAbout={handleNavigateToAbout}
+          onApplyFilters={handleApplyFilters}
+          onResetFilters={handleResetFilters}
+        />
       ) : currentView === 'about' ? (
         <AboutUs onNavigateToHome={handleNavigateToHome} />
       ) : (
