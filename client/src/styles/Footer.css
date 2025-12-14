@@ -1,8 +1,21 @@
 .footer {
   background-color: #f8f9fa;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   padding: 10px;
   border-top: 1px solid #e7e7e7;
   font-family: sans-serif;
+  position: relative;
+  z-index: 100;
+  /* Ensure footer is above all background layers and completely opaque */
+  isolation: isolate;
+  /* Force solid background - no transparency */
+  background-image: none !important;
+  /* Ensure text and images are sharp */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
 
 .footer-container {
@@ -13,6 +26,11 @@
   margin: 0 auto;
   gap: var(--space-6);
   padding: var(--space-6) var(--space-4);
+  position: relative;
+  z-index: 1;
+  /* Ensure content is sharp and clear */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .footer-logos {
@@ -76,9 +94,15 @@
 }
 
 .footer-link:hover {
-  color: var(--primary-blue);
+  color: var(--primary-red);
   background-color: var(--gray-50);
-  text-decoration: none;
+  text-decoration: underline;
+}
+
+.footer-link:focus {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .footer-link-external {

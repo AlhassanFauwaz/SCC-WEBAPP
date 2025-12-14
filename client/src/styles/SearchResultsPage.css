@@ -3,18 +3,90 @@
   display: flex;
   flex-direction: column;
   background-color: var(--gray-50);
+  position: relative;
+  /* Subtle Ghanaian Flag with Gavel Background */
+  background-image: url('../Assets/hammer-gave234649.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.search-results-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Light overlay to maintain readability while showing Ghanaian identity */
+  background: rgba(249, 250, 251, 0.95);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Clear spacer between header and main content - ensures no blur */
+.search-results-page::after {
+  content: '';
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  height: var(--space-8);
+  background: rgba(249, 250, 251, 0.98);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  z-index: 999;
+  pointer-events: none;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+@media (max-width: 768px) {
+  .search-results-page::after {
+    top: 60px;
+    height: var(--space-6);
+  }
+  
+  .main-content {
+    padding-top: calc(60px + var(--space-6));
+  }
 }
 
 .main-content {
   flex: 1;
   padding: var(--space-8) var(--space-4);
+  padding-top: calc(70px + var(--space-8)); /* Account for fixed header + spacing */
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Clear spacer between header and main content */
+.search-results-page::after {
+  content: '';
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  height: var(--space-8);
+  background: rgba(249, 250, 251, 0.98);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  z-index: 999;
+  pointer-events: none;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
 }
 
 .results-section {
   animation: fadeIn 0.5s ease-out;
+  position: relative;
+  z-index: 1;
+  /* Ensure content is clear and not affected by background */
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 @keyframes fadeIn {
@@ -102,6 +174,11 @@
   background-color: #fef2f2;
   border: 1px solid #fecaca;
   color: var(--error);
+}
+
+.error-alert:focus {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
 }
 
 .error-alert i {
@@ -193,6 +270,17 @@
 @media (min-width: 1200px) {
   .results-grid {
     grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  }
+}
+
+/* Mobile: Disable fixed background for better performance */
+@media (max-width: 768px) {
+  .search-results-page {
+    background-attachment: scroll;
+  }
+  
+  .search-results-page::before {
+    background: rgba(249, 250, 251, 0.98);
   }
 }
 
