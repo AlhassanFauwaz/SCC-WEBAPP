@@ -7,7 +7,7 @@
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-bottom: 2px solid rgba(206, 17, 38, 0.1);
+  border-bottom: 2px solid var(--border-color, rgba(206, 17, 38, 0.1));
   transition: all var(--transition-base);
   /* Ensure header is completely clear and above all backgrounds */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -39,7 +39,7 @@
   gap: var(--space-3);
   font-weight: 700;
   font-size: var(--font-size-xl);
-  color: var(--primary-red);
+  color: var(--text-primary, var(--primary-red));
   transition: all var(--transition-base);
   cursor: pointer;
 }
@@ -71,7 +71,7 @@
 .nav-link {
   padding: var(--space-3) var(--space-5);
   background: transparent;
-  color: var(--primary-red);
+  color: var(--text-primary, var(--primary-red));
   border: 2px solid var(--primary-red);
   border-radius: var(--border-radius-full);
   font-weight: 600;

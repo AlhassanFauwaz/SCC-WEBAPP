@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import ThemeSwitcher from './ThemeSwitcher';
 import '../styles/Header.css';
 
 interface HeaderProps {
@@ -50,6 +51,7 @@ const Header: React.FC<HeaderProps> = ({ showBackButton = false, onBackClick, on
         </div>
         
         <div className="nav-right">
+          <ThemeSwitcher />
           {!showBackButton && (
             <Link to="/about" onClick={handleAboutClick} className="nav-link">
               About Us

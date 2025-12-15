@@ -11,12 +11,12 @@
 .case-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-xl);
-  border-color: var(--primary-red-light);
+  border-color: var(--border-color, var(--primary-red-light));
 }
 
 .case-card-header {
   padding: var(--space-6);
-  background: linear-gradient(135deg, var(--primary-red-subtle), var(--white));
+  background: linear-gradient(135deg, var(--primary-red-subtle), var(--card-background, var(--white)));
   border-bottom: 1px solid var(--gray-100);
 }
 
@@ -38,7 +38,7 @@
 }
 
 .case-date i {
-  color: var(--primary-red);
+  color: var(--text-primary, var(--primary-red));
   font-size: var(--font-size-xs);
 }
 
@@ -59,7 +59,7 @@
   gap: var(--space-2);
   font-size: var(--font-size-sm);
   font-weight: 600;
-  color: var(--primary-red);
+  color: var(--text-primary, var(--primary-red));
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -94,7 +94,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  color: var(--primary-red);
+  color: var(--text-primary, var(--primary-red));
   font-size: var(--font-size-sm);
   font-weight: 600;
   text-decoration: none;

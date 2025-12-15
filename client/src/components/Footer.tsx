@@ -3,6 +3,7 @@ import '../styles/Footer.css';
 import wikimediaLogo from '../Assets/Wikimedia-logo.svg';
 import mediaWikiLogo from '../Assets/MediaWikilogo.svg.png';
 import goifLogo from '../Assets/goig.png';
+import wikidataLogo from '../Assets/wwiki.png';
 
 interface FooterProps {
   onNavigateToAbout?: () => void;
@@ -101,6 +102,18 @@ const Footer: React.FC<FooterProps> = ({ onNavigateToAbout, onNavigateToHome }) 
                     src={goifLogo} 
                     alt="GOIF Logo" 
                     className="footer-goif-logo"
+                  />
+                </a>
+                <a 
+                  href="https://www.wikidata.org" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="footer-credit-link footer-wikidata-link"
+                >
+                  <img 
+                    src={wikidataLogo} 
+                    alt="Wikidata Logo" 
+                    className="footer-wikidata-logo"
                   />
                 </a>
               </div>

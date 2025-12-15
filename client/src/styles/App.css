@@ -113,8 +113,10 @@ body {
   min-height: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Subtle Ghanaian background for entire app */
-  background-image: url('../Assets/hammer-gave234649.jpg');
+  /* Dynamic country-themed background */
+  /* For Ghana: use image, for others: use gradient */
+  background-image: var(--background-image);
+  background: var(--background-gradient);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -145,7 +147,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: var(--space-4);
-  color: var(--secondary-green); /* Ghana Flag Green */
+  color: var(--text-primary, var(--secondary-green)); /* Dynamic country color */
 }
 
 h1 { font-size: var(--font-size-4xl); }

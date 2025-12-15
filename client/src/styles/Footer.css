@@ -227,6 +227,10 @@
 
 .footer-goif-credit {
   margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
 }
 
 .footer-goif-credit .footer-goif-logo {
@@ -234,6 +238,24 @@
   width: auto;
   max-width: 150px;
   object-fit: contain;
+}
+
+.footer-wikidata-link {
+  display: flex;
+  align-items: center;
+}
+
+.footer-wikidata-logo {
+  height: 50px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+}
+
+.footer-goif-credit .footer-credit-text,
+.footer-goif-credit span,
+.footer-goif-credit a {
+  color: #ffffff !important;
 }
 
 .footer-wikimedia-logo,

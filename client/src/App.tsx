@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ThemeProvider } from './contexts/ThemeContext';
 import HomePage from './components/HomePage';
 import SearchResultsPage from './components/SearchResultsPage';
 import AboutUs from './components/AboutUs';
@@ -224,27 +225,29 @@ function App() {
   };
 
   return (
-    <div className="app">
-      {currentView === 'home' ? (
-        <HomePage 
-          onSearch={handleSearch} 
-          onNavigateToAbout={handleNavigateToAbout}
-          onApplyFilters={handleApplyFilters}
-          onResetFilters={handleResetFilters}
-        />
-      ) : currentView === 'about' ? (
-        <AboutUs onNavigateToHome={handleNavigateToHome} />
-      ) : (
-        <SearchResultsPage
-          searchState={searchState}
-          onBackToSearch={handleBackToSearch}
-          onApplyFilters={handleApplyFilters}
-          onResetFilters={handleResetFilters}
-          onNavigateToHome={handleNavigateToHome}
-          onNavigateToAbout={handleNavigateToAbout}
-        />
-      )}
-    </div>
+    <ThemeProvider>
+      <div className="app">
+        {currentView === 'home' ? (
+          <HomePage 
+            onSearch={handleSearch} 
+            onNavigateToAbout={handleNavigateToAbout}
+            onApplyFilters={handleApplyFilters}
+            onResetFilters={handleResetFilters}
+          />
+        ) : currentView === 'about' ? (
+          <AboutUs onNavigateToHome={handleNavigateToHome} />
+        ) : (
+          <SearchResultsPage
+            searchState={searchState}
+            onBackToSearch={handleBackToSearch}
+            onApplyFilters={handleApplyFilters}
+            onResetFilters={handleResetFilters}
+            onNavigateToHome={handleNavigateToHome}
+            onNavigateToAbout={handleNavigateToAbout}
+          />
+        )}
+      </div>
+    </ThemeProvider>
   );
 }
 

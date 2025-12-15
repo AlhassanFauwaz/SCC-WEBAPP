@@ -4,8 +4,10 @@
   flex-direction: column;
   background-color: var(--white);
   position: relative;
-  /* Ghanaian Flag with Gavel Background */
-  background-image: url('../Assets/hammer-gave234649.jpg');
+  /* Dynamic country-themed background */
+  /* For Ghana: use image, for others: use gradient */
+  background-image: var(--background-image);
+  background: var(--background-gradient);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -79,8 +81,10 @@
   text-align: center;
   padding: var(--space-16) var(--space-4) var(--space-12);
   position: relative;
-  /* Ghanaian Flag with Gavel Background */
-  background-image: url('../Assets/hammer-gave234649.jpg');
+  /* Dynamic country-themed background */
+  /* For Ghana: use image, for others: use gradient */
+  background-image: var(--background-image);
+  background: var(--background-gradient);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -98,13 +102,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  /* Overlay: Ghanaian flag colors with transparency */
-  background: linear-gradient(
+  /* Overlay: Dynamic country flag colors with transparency */
+  background: var(--background-overlay, linear-gradient(
     135deg,
     rgba(206, 17, 38, 0.80) 0%,
     rgba(252, 209, 22, 0.75) 50%,
     rgba(0, 107, 63, 0.80) 100%
-  );
+  ));
   z-index: 0;
   border-radius: var(--border-radius-2xl);
 }
