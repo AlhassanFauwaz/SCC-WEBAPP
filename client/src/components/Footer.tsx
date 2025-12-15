@@ -31,39 +31,18 @@ const Footer: React.FC<FooterProps> = ({ onNavigateToAbout, onNavigateToHome }) 
 
   return (
     <footer className="footer">
-      <div className="footer-main">
-        <div className="footer-container">
-          {/* Column 1: Ghana Supreme Cases */}
-          <div className="footer-column">
-            <div className="footer-brand">
-              <div className="footer-logo-text">
-                <span className="footer-logo-icon">⚖</span>
-                <span className="footer-logo-acronym">SCC</span>
-              </div>
-              <h3 className="footer-column-title">Ghana Supreme Cases</h3>
-            </div>
-            <div className="footer-platform-tag">
-              <div className="footer-powered-by">
-                <span className="footer-powered-text">
-                  <a 
-                    href="https://goif.org" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="footer-link-inline"
-                  >
-                    GOIF
-                  </a>
-                  {' '}powered by{' '}
-                  <a 
-                    href="https://wikimedia.org" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="footer-link-inline"
-                  >
-                    Wikimedia
-                  </a>
-                </span>
-              </div>
+      <div className="footer-container">
+        <div className="footer-logos">
+          <img src="/logo.png" alt="Logo" className="footer-logo" />
+          <img src="wikidata.png" alt="Wikidata logo" className="footer-logo" />
+        </div>
+
+        <div className="footer-content">
+          <nav className="footer-nav">
+            <div className="footer-nav-links">
+              <Link to="/about" onClick={handleAboutClick} className="footer-link">
+                About Us
+              </Link>
             </div>
             <p className="footer-description">
               An open-source platform providing a searchable database of Supreme Court cases in Ghana. 
