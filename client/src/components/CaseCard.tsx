@@ -1,12 +1,14 @@
 import React from 'react';
 import { Case } from '../../App';
+import { highlightSearchTerms } from '../utils/searchSuggestions';
 import '../styles/CaseCard.css';
 
 interface CaseCardProps {
   case: Case;
+  searchQuery?: string;
 }
 
-const CaseCard: React.FC<CaseCardProps> = ({ case: caseItem }) => {
+const CaseCard: React.FC<CaseCardProps> = ({ case: caseItem, searchQuery = '' }) => {
   const formatDate = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleDateString('en-US', {
@@ -19,10 +21,17 @@ const CaseCard: React.FC<CaseCardProps> = ({ case: caseItem }) => {
     }
   };
 
+  const renderHighlightedText = (text: string) => {
+    if (!searchQuery.trim()) return text;
+    
+    const highlighted = highlightSearchTerms(text, searchQuery);
+    return <span dangerouslySetInnerHTML={{ __html: highlighted }} />;
+  };
+
   return (
     <div className="case-card">
       <div className="case-card-header">
-        <h3 className="case-title">{caseItem.title}</h3>
+        <h3 className="case-title">{renderHighlightedText(caseItem.title)}</h3>
         <div className="case-date">
           <i className="fas fa-calendar-alt"></i>
           <span>{formatDate(caseItem.date)}</span>
@@ -35,7 +44,7 @@ const CaseCard: React.FC<CaseCardProps> = ({ case: caseItem }) => {
             <i className="fas fa-bookmark"></i>
             Citation
           </label>
-          <p className="field-value">{caseItem.citation}</p>
+          <p className="field-value">{renderHighlightedText(caseItem.citation)}</p>
         </div>
 
         <div className="case-field">
@@ -43,7 +52,7 @@ const CaseCard: React.FC<CaseCardProps> = ({ case: caseItem }) => {
             <i className="fas fa-building"></i>
             Court
           </label>
-          <p className="field-value">{caseItem.court}</p>
+          <p className="field-value">{renderHighlightedText(caseItem.court)}</p>
         </div>
 
         <div className="case-field">
@@ -51,7 +60,7 @@ const CaseCard: React.FC<CaseCardProps> = ({ case: caseItem }) => {
             <i className="fas fa-users"></i>
             Judges
           </label>
-          <p className="field-value">{caseItem.judges}</p>
+          <p className="field-value">{renderHighlightedText(caseItem.judges)}</p>
         </div>
 
         <div className="case-field">
@@ -59,7 +68,7 @@ const CaseCard: React.FC<CaseCardProps> = ({ case: caseItem }) => {
             <i className="fas fa-gavel"></i>
             Majority Opinion
           </label>
-          <p className="field-value">{caseItem.majorityOpinion}</p>
+          <p className="field-value">{renderHighlightedText(caseItem.majorityOpinion)}</p>
         </div>
 
         <div className="case-field">
@@ -67,7 +76,7 @@ const CaseCard: React.FC<CaseCardProps> = ({ case: caseItem }) => {
             <i className="fas fa-book"></i>
             Source
           </label>
-          <p className="field-value">{caseItem.sourceLabel}</p>
+          <p className="field-value">{renderHighlightedText(caseItem.sourceLabel)}</p>
         </div>
 
         {caseItem.description && caseItem.description !== 'No description available' && (
@@ -76,7 +85,7 @@ const CaseCard: React.FC<CaseCardProps> = ({ case: caseItem }) => {
               <i className="fas fa-info-circle"></i>
               Description
             </label>
-            <p className="field-value description">{caseItem.description}</p>
+            <p className="field-value description">{renderHighlightedText(caseItem.description)}</p>
           </div>
         )}
       </div>
