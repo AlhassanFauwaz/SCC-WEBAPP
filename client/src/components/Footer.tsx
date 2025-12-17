@@ -32,17 +32,23 @@ const Footer: React.FC<FooterProps> = ({ onNavigateToAbout, onNavigateToHome }) 
   return (
     <footer className="footer">
       <div className="footer-container">
-        <div className="footer-logos">
-          <img src="/logo.png" alt="Logo" className="footer-logo" />
-          <img src="wikidata.png" alt="Wikidata logo" className="footer-logo" />
-        </div>
-
         <div className="footer-content">
-          <nav className="footer-nav">
-            <div className="footer-nav-links">
-              <Link to="/about" onClick={handleAboutClick} className="footer-link">
-                About Us
-              </Link>
+          {/* Column 1: SCC Ghana Supreme Cases */}
+          <div className="footer-column">
+            <div className="footer-brand">
+              <div className="footer-logo-text">
+                <span className="footer-logo-icon">⚖️</span>
+                <span className="footer-logo-acronym">SCC</span>
+              </div>
+              <h2 className="footer-brand-title">Ghana Supreme Cases</h2>
+              <a 
+                href="https://goif.org" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="footer-powered-text"
+              >
+                GOIF powered by Wikimedia
+              </a>
             </div>
             <p className="footer-description">
               An open-source platform providing a searchable database of Supreme Court cases in Ghana. 
