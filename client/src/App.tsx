@@ -4,6 +4,7 @@ import HomePage from './components/HomePage';
 import SearchResultsPage from './components/SearchResultsPage';
 import AboutUs from './components/AboutUs';
 import { FilterValues } from './components/FilterPanel';
+import { SearchHistoryManager } from './utils/searchHistory';
 import './styles/App.css';
 
 export interface Case {
@@ -35,6 +36,8 @@ export interface SearchState {
   error: string | null;
   isFiltered?: boolean;
   pagination?: PaginationInfo;
+  appliedFilters?: FilterValues;
+  totalCount?: number;
 }
 
 function App() {
@@ -100,11 +103,15 @@ function App() {
         throw new Error('Unexpected response format. Results should be an array.');
       }
 
+      // Save to search history
+      SearchHistoryManager.addToHistory(query, data.results.length);
+
       setSearchState(prev => ({
         ...prev,
         loading: false,
         results: data.results,
         pagination: data.pagination,
+        totalCount: data.results.length,
         error: data.results.length === 0 ? `No matches found for "${query}".` : null
       }));
 
@@ -199,6 +206,8 @@ function App() {
         loading: false,
         results: data.results || [],
         pagination: data.pagination,
+        totalCount: data.results?.length || 0,
+        appliedFilters: filters,
         error: data.results && data.results.length === 0 ? 'No cases found matching the filters.' : null,
         isFiltered: true,
         query: '' // Clear query when using filters

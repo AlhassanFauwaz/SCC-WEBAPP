@@ -1,12 +1,15 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import CaseCard from './CaseCard';
 import LoadingSpinner from './LoadingSpinner';
 import FilterPanel, { FilterValues } from './FilterPanel';
 import Pagination from './Pagination';
+import SortOptions, { SortOption } from './SortOptions';
 import { SearchState } from '../../App';
+import { sortCases } from '../utils/sortCases';
 import '../styles/SearchResultsPage.css';
+import '../styles/AppliedFilters.css';
 
 interface SearchResultsPageProps {
   searchState: SearchState;
@@ -29,9 +32,17 @@ const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
   onRetry,
   onSearch
 }) => {
-  const { query, results, loading, error, pagination } = searchState;
+  const { query, results, loading, error, pagination, appliedFilters, totalCount } = searchState;
   const [itemsPerPage, setItemsPerPage] = useState(pagination?.itemsPerPage || 20);
+  const [sortOption, setSortOption] = useState<SortOption>('relevance');
   const observerRef = useRef<IntersectionObserver | null>(null);
+  
+  // Sort results based on selected option
+  const sortedResults = useMemo(() => {
+    return sortCases(results, sortOption, query);
+  }, [results, sortOption, query]);
+
+  const displayCount = totalCount !== undefined ? totalCount : (pagination?.totalItems || results.length);
   
   const lastCaseElementRef = useCallback((node: HTMLDivElement | null) => {
     if (loading) return;
@@ -92,25 +103,71 @@ const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
             </div>
           ) : (
             <>
+              {/* Sort Options and Results Count */}
+              <SortOptions
+                currentSort={sortOption}
+                onSortChange={setSortOption}
+                totalResults={displayCount}
+              />
+
+              {/* Applied Filters Display */}
+              {appliedFilters && (
+                <div className="applied-filters">
+                  <h3 className="applied-filters-title">
+                    <i className="fas fa-filter"></i>
+                    Applied Filters:
+                  </h3>
+                  <div className="applied-filters-list">
+                    {appliedFilters.keyword && (
+                      <span className="filter-badge">
+                        <i className="fas fa-key"></i>
+                        Keyword: {appliedFilters.keyword}
+                      </span>
+                    )}
+                    {appliedFilters.year && (
+                      <span className="filter-badge">
+                        <i className="fas fa-calendar"></i>
+                        Year: {appliedFilters.year}
+                      </span>
+                    )}
+                    {appliedFilters.judge && (
+                      <span className="filter-badge">
+                        <i className="fas fa-user-gavel"></i>
+                        Judge: {appliedFilters.judge}
+                      </span>
+                    )}
+                    {appliedFilters.caseType && (
+                      <span className="filter-badge">
+                        <i className="fas fa-gavel"></i>
+                        Type: {appliedFilters.caseType}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="results-header">
                 <h2>Search Results</h2>
                 <p className="results-count">
                   {pagination 
                     ? `Showing ${pagination.currentPage === 1 ? 1 : ((pagination.currentPage - 1) * itemsPerPage) + 1} to ${Math.min(pagination.currentPage * itemsPerPage, pagination.totalItems)} of ${pagination.totalItems} cases`
-                    : `Found ${results.length} case${results.length !== 1 ? 's' : ''}`
+                    : `Found ${displayCount} case${displayCount !== 1 ? 's' : ''}`
                   }
                   {query && ` for "${query}"`}
                 </p>
               </div>
               <div className="results-grid">
-                {results.map((caseItem, index) => {
-                  const isLastElement = index === results.length - 1;
+                {sortedResults.map((caseItem, index) => {
+                  const isLastElement = index === sortedResults.length - 1;
                   return (
                     <div
                       key={`${caseItem.caseId}-${index}`}
                       ref={isLastElement ? lastCaseElementRef : null}
                     >
-                      <CaseCard case={caseItem} />
+                      <CaseCard
+                        case={caseItem}
+                        searchQuery={query}
+                      />
                     </div>
                   );
                 })}
