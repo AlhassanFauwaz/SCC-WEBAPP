@@ -37,10 +37,21 @@ export interface FilterResponse {
         caseType: string | null;
     };
     count: number;
+    pagination?: PaginationInfo;
+}
+
+export interface PaginationInfo {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
 }
 
 export interface SearchResponse {
     success: boolean;
     results: Case[];
+    pagination?: PaginationInfo;
 }
 

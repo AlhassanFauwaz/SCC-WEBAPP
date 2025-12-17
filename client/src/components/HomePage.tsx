@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import FilterPanel, { FilterValues } from './FilterPanel';
+import { useDebounce } from '../utils/debounce';
 import '../styles/HomePage.css';
 
 interface HomePageProps {
-  onSearch: (query: string) => void;
+  onSearch: (query: string, page?: number, limit?: number) => void;
   onNavigateToAbout?: () => void;
-  onApplyFilters?: (filters: FilterValues) => void;
+  onApplyFilters?: (filters: FilterValues, page?: number, limit?: number) => void;
   onResetFilters?: () => void;
 }
 
@@ -19,6 +20,16 @@ const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Debounce search input (300ms delay)
+  const debouncedQuery = useDebounce(query, 300);
+
+  // Auto-search when debounced query changes (optional - can be removed if you prefer manual search only)
+  // useEffect(() => {
+  //   if (debouncedQuery.trim() && debouncedQuery.length >= 2) {
+  //     onSearch(debouncedQuery.trim());
+  //   }
+  // }, [debouncedQuery, onSearch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

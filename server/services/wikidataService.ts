@@ -1,33 +1,56 @@
 import axios from "axios";
 import { Case } from "../models/Case";
+import { CacheService } from "./cacheService";
 
 /**
  * Service for fetching cases from Wikidata
+ * Includes caching to reduce API calls and improve performance
  */
 export class WikidataService {
   private static readonly WIKIDATA_SPARQL_URL =
     "https://query.wikidata.org/sparql";
   private static readonly TIMEOUT = 30000; // Increased to 30 seconds to match server.ts
   private static readonly MAX_RESULTS = 5000;
+  private static readonly CACHE_KEY = "wikidata:all-cases";
+  private static readonly CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
   /**
    * Fetches all Supreme Court cases from Wikidata
+   * Uses caching to reduce API calls
+   * @param forceRefresh Force refresh from API, bypassing cache
    * @returns Promise<Case[]> Array of case objects
    */
-  static async fetchCases(): Promise<Case[]> {
+  static async fetchCases(forceRefresh: boolean = false): Promise<Case[]> {
+    // Check cache first
+    if (!forceRefresh) {
+      const cached = CacheService.get<Case[]>(this.CACHE_KEY);
+      if (cached) {
+        console.log("✅ Using cached Wikidata data");
+        return cached;
+      }
+    }
+
     const sparqlQuery = this.buildSparqlQuery();
     const url = `${this.WIKIDATA_SPARQL_URL}?query=${encodeURIComponent(
       sparqlQuery
     )}&format=json`;
 
     try {
+      console.log("🌐 Fetching fresh data from Wikidata...");
       const { data } = await axios.get(url, { 
         timeout: this.TIMEOUT,
         headers: {
           'User-Agent': 'SupremeCourtGhana-WebApp/1.0'
         }
       });
-      return this.parseWikidataResponse(data);
+      
+      const cases = this.parseWikidataResponse(data);
+      
+      // Cache the results
+      CacheService.set(this.CACHE_KEY, cases, this.CACHE_TTL);
+      console.log(`✅ Cached ${cases.length} cases for ${this.CACHE_TTL / 1000 / 60} minutes`);
+      
+      return cases;
     } catch (error: any) {
       console.error("❌ Wikidata API Error:", error);
       

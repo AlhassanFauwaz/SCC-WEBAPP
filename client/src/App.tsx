@@ -19,12 +19,22 @@ export interface Case {
   articleUrl: string;
 }
 
+export interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 export interface SearchState {
   query: string;
   results: Case[];
   loading: boolean;
   error: string | null;
   isFiltered?: boolean;
+  pagination?: PaginationInfo;
 }
 
 function App() {
@@ -48,7 +58,7 @@ function App() {
     };
   }, []);
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, page: number = 1, limit: number = 20) => {
     if (!query.trim()) return;
 
     setSearchState(prev => ({ ...prev, loading: true, error: null, query }));
@@ -56,7 +66,7 @@ function App() {
 
     try {
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9090';
-      const response = await fetch(`${apiBaseUrl}/search?q=${encodeURIComponent(query)}`, {
+      const response = await fetch(`${apiBaseUrl}/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`, {
         signal: AbortSignal.timeout(30000) // 30 second timeout
       });
 
@@ -94,6 +104,7 @@ function App() {
         ...prev,
         loading: false,
         results: data.results,
+        pagination: data.pagination,
         error: data.results.length === 0 ? `No matches found for "${query}".` : null
       }));
 
@@ -133,7 +144,7 @@ function App() {
     setSearchState(prev => ({ ...prev, query: '', results: [], error: null, isFiltered: false }));
   };
 
-  const handleApplyFilters = async (filters: FilterValues) => {
+  const handleApplyFilters = async (filters: FilterValues, page: number = 1, limit: number = 20) => {
     setSearchState(prev => ({ ...prev, loading: true, error: null }));
     setCurrentView('results');
 
@@ -146,6 +157,8 @@ function App() {
       if (filters.year) params.append('year', filters.year);
       if (filters.judge) params.append('judge', filters.judge);
       if (filters.caseType) params.append('type', filters.caseType);
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
 
       const response = await fetch(`${apiBaseUrl}/filter?${params.toString()}`, {
         signal: AbortSignal.timeout(30000) // 30 second timeout
@@ -185,6 +198,7 @@ function App() {
         ...prev,
         loading: false,
         results: data.results || [],
+        pagination: data.pagination,
         error: data.results && data.results.length === 0 ? 'No cases found matching the filters.' : null,
         isFiltered: true,
         query: '' // Clear query when using filters
@@ -240,10 +254,16 @@ function App() {
           <SearchResultsPage
             searchState={searchState}
             onBackToSearch={handleBackToSearch}
-            onApplyFilters={handleApplyFilters}
+            onApplyFilters={(filters, page, limit) => handleApplyFilters(filters, page || 1, limit || 20)}
             onResetFilters={handleResetFilters}
             onNavigateToHome={handleNavigateToHome}
             onNavigateToAbout={handleNavigateToAbout}
+            onRetry={() => {
+              if (searchState.query) {
+                handleSearch(searchState.query, 1, 20);
+              }
+            }}
+            onSearch={(query, page, limit) => handleSearch(query, page || 1, limit || 20)}
           />
         )}
       </div>

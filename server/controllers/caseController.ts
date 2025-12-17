@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { WikidataService } from "../services/wikidataService";
 import { CaseFilterService } from "../services/caseFilterService";
+import { CacheService } from "../services/cacheService";
 import { CaseFilters, FilterResponse, SearchResponse } from "../models/Case";
 
 /**
@@ -14,8 +15,20 @@ export class CaseController {
    */
   static async search(req: Request, res: Response): Promise<void> {
     const userQuery = (req.query.q as string)?.trim().toLowerCase() || "";
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50); // Max 50 per page
 
     try {
+      // Check cache for this specific search query
+      const cacheKey = `search:${userQuery}:page:${page}:limit:${limit}`;
+      const cached = CacheService.get<SearchResponse>(cacheKey);
+      
+      if (cached) {
+        console.log(`✅ Using cached search results for: "${userQuery}"`);
+        res.json(cached);
+        return;
+      }
+
       const cases = await WikidataService.fetchCases();
 
       const filteredCases = cases.filter((caseData) => {
@@ -33,10 +46,26 @@ export class CaseController {
         );
       });
 
+      // Pagination
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedResults = filteredCases.slice(startIndex, endIndex);
+
       const response: SearchResponse = {
         success: true,
-        results: filteredCases,
+        results: paginatedResults,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(filteredCases.length / limit),
+          totalItems: filteredCases.length,
+          itemsPerPage: limit,
+          hasNextPage: endIndex < filteredCases.length,
+          hasPreviousPage: page > 1,
+        },
       };
+
+      // Cache the response for 5 minutes
+      CacheService.set(cacheKey, response, 5 * 60 * 1000);
 
       res.json(response);
     } catch (error) {
@@ -58,6 +87,8 @@ export class CaseController {
     const year = (req.query.year as string)?.trim() || "";
     const judge = (req.query.judge as string)?.trim() || "";
     const caseType = (req.query.type as string)?.trim() || "";
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50); // Max 50 per page
 
     // Validate year if provided
     if (year && !CaseFilterService.validateYear(year)) {
@@ -70,6 +101,16 @@ export class CaseController {
     }
 
     try {
+      // Check cache for this specific filter query
+      const cacheKey = `filter:${keyword}:${year}:${judge}:${caseType}:page:${page}:limit:${limit}`;
+      const cached = CacheService.get<FilterResponse>(cacheKey);
+      
+      if (cached) {
+        console.log(`✅ Using cached filter results`);
+        res.json(cached);
+        return;
+      }
+
       const cases = await WikidataService.fetchCases();
 
       const filters: CaseFilters = {
@@ -81,9 +122,14 @@ export class CaseController {
 
       const filteredCases = CaseFilterService.filterCases(cases, filters);
 
+      // Pagination
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedResults = filteredCases.slice(startIndex, endIndex);
+
       const response: FilterResponse = {
         success: true,
-        results: filteredCases,
+        results: paginatedResults,
         filters: {
           keyword: keyword || null,
           year: year || null,
@@ -91,7 +137,18 @@ export class CaseController {
           caseType: caseType || null,
         },
         count: filteredCases.length,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(filteredCases.length / limit),
+          totalItems: filteredCases.length,
+          itemsPerPage: limit,
+          hasNextPage: endIndex < filteredCases.length,
+          hasPreviousPage: page > 1,
+        },
       };
+
+      // Cache the response for 5 minutes
+      CacheService.set(cacheKey, response, 5 * 60 * 1000);
 
       res.json(response);
     } catch (error) {
