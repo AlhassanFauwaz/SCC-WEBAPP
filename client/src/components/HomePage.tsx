@@ -30,38 +30,49 @@ const HomePage: React.FC<HomePageProps> = ({
   const [suggestions, setSuggestions] = useState<ReturnType<typeof generateSuggestions>>([]);
   const [allCases, setAllCases] = useState<Case[]>([]);
   const searchBoxRef = useRef<HTMLDivElement>(null);
-  const debouncedQuery = useDebounce(query, 300);
+  // Reduced debounce to 150ms for faster response, but still prevent excessive API calls
+  const debouncedQuery = useDebounce(query, 150);
 
   // Fetch all cases for suggestions (can be optimized later)
   useEffect(() => {
     const fetchCasesForSuggestions = async () => {
       try {
         const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9090';
-        const response = await fetch(`${apiBaseUrl}/search?q=`, {
+        const response = await fetch(`${apiBaseUrl}/search?q=&limit=200`, {
           signal: AbortSignal.timeout(10000)
         });
         if (response.ok) {
           const data = await response.json();
-          if (data.results) {
-            setAllCases(data.results.slice(0, 100)); // Limit for performance
+          if (data.results && Array.isArray(data.results)) {
+            setAllCases(data.results.slice(0, 200)); // Increased limit for better suggestions
           }
         }
       } catch (error) {
-        // Silently fail - suggestions are optional
+        // Silently fail - suggestions are optional, will use popular terms as fallback
       }
     };
     fetchCasesForSuggestions();
   }, []);
 
-  // Generate suggestions when query changes
+  // Generate suggestions immediately when query changes (for instant feedback)
   useEffect(() => {
-    if (debouncedQuery.trim() || (!query.trim() && showAutocomplete)) {
+    const queryTrimmed = query.trim();
+    if (queryTrimmed.length > 0) {
       const recentSearches = SearchHistoryManager.getRecent(10).map(item => item.query);
-      const newSuggestions = generateSuggestions(debouncedQuery, allCases, recentSearches);
+      const newSuggestions = generateSuggestions(query, allCases, recentSearches);
       setSuggestions(newSuggestions);
-      setShowAutocomplete(newSuggestions.length > 0 || !debouncedQuery.trim());
+      // Show autocomplete immediately if we have suggestions
+      if (newSuggestions.length > 0) {
+        setShowAutocomplete(true);
+      } else {
+        setShowAutocomplete(false);
+      }
+    } else {
+      // Clear suggestions when query is empty
+      setSuggestions([]);
+      setShowAutocomplete(false);
     }
-  }, [debouncedQuery, allCases, showAutocomplete, query]);
+  }, [query, allCases]); // Use query directly, not debounced, for immediate response
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,9 +84,17 @@ const HomePage: React.FC<HomePageProps> = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
-    setShowAutocomplete(true);
-    setShowHistory(false);
+    const newValue = e.target.value;
+    setQuery(newValue);
+    // Show autocomplete immediately when typing
+    if (newValue.trim().length > 0) {
+      setShowAutocomplete(true);
+      setShowHistory(false);
+    } else {
+      // Show history when input is empty
+      setShowAutocomplete(false);
+      setShowHistory(true);
+    }
   };
 
   const handleInputFocus = () => {
@@ -133,30 +152,32 @@ const HomePage: React.FC<HomePageProps> = ({
           
           <div className="search-container">
             <form className="search-form" onSubmit={handleSubmit}>
-              <div className="search-box" ref={searchBoxRef}>
-                <input
-                  type="text"
-                  value={query}
-                  onChange={handleInputChange}
-                  onFocus={handleInputFocus}
-                  onClick={handleInputClick}
-                  placeholder="Search for a case by name, number, or keyword"
-                  className="search-input"
-                  autoComplete="off"
-                  required
-                />
-                <button 
-                  type="submit" 
-                  className="search-button"
-                >
-                  <i className="fas fa-search"></i>
-                </button>
+              <div className="search-box-wrapper">
+                <div className="search-box" ref={searchBoxRef}>
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={handleInputChange}
+                    onFocus={handleInputFocus}
+                    onClick={handleInputClick}
+                    placeholder="Search for a case by name, number, or keyword"
+                    className="search-input"
+                    autoComplete="off"
+                    required
+                  />
+                  <button 
+                    type="submit" 
+                    className="search-button"
+                  >
+                    <i className="fas fa-search"></i>
+                  </button>
+                </div>
                 
-                {/* Search Autocomplete */}
+                {/* Search Autocomplete - Shows immediately when typing */}
                 <SearchAutocomplete
                   query={query}
                   suggestions={suggestions}
-                  isVisible={showAutocomplete && query.trim().length > 0}
+                  isVisible={showAutocomplete && query.trim().length > 0 && suggestions.length > 0}
                   onSelectSuggestion={handleSelectSuggestion}
                   onClose={() => setShowAutocomplete(false)}
                   searchHistory={SearchHistoryManager.getRecent(5).map(item => item.query)}
@@ -166,7 +187,7 @@ const HomePage: React.FC<HomePageProps> = ({
                   }}
                 />
                 
-                {/* Search History */}
+                {/* Search History - Outside search-box to avoid overflow clipping */}
                 <SearchHistory
                   isVisible={showHistory && !query.trim()}
                   onSelectQuery={handleSelectHistory}
