@@ -142,11 +142,15 @@ const HomePage: React.FC<HomePageProps> = ({
     setShowFilters(false);
   };
 
+  // Determine if dropdown is visible
+  const isDropdownVisible = (showAutocomplete && query.trim().length > 0 && suggestions.length > 0) || 
+                            (showHistory && !query.trim());
+
   return (
     <div className="home-page">
       <Header showBackButton={false} onNavigateToAbout={onNavigateToAbout} />
       
-      <main className="hero-section">
+      <main className={`hero-section ${isDropdownVisible ? 'hero-section-expanded' : ''}`}>
         <div className="hero-overlay">
           <h1 className="hero-title">SUPREME COURT CASES</h1>
           
@@ -193,6 +197,7 @@ const HomePage: React.FC<HomePageProps> = ({
                   onSelectQuery={handleSelectHistory}
                   onClearHistory={() => setShowHistory(false)}
                   onClose={() => setShowHistory(false)}
+                  cases={allCases}
                 />
               </div>
             </form>
